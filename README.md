@@ -124,3 +124,8 @@ The simulation is a Progressive Web App. After running `npm run build`:
 ## License
 
 MIT
+
+## Contributing
+
+See [OpenPhysics contributing guidelines](https://github.com/OpenPhysics/.github/blob/main/CONTRIBUTING.md).
+Report bugs via GitHub Issues; use org issue templates.
