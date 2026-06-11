@@ -48,7 +48,7 @@ New sims start at `version: "0.0.0"` in `package.json`. Bump only when cutting a
 
 ## License
 
-MIT
+GNU Affero General Public License v3.0 — see [OpenPhysics org license](https://github.com/OpenPhysics/.github/blob/main/LICENSE).
 
 ## Contributing
 
