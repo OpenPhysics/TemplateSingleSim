@@ -10,7 +10,7 @@ Vite 8, TypeScript 6, and Biome 2.
 - Default and projector color profiles
 - Progressive Web App (installable, offline-capable)
 - Git hooks for Biome pre-commit checks
-- Shared GitHub Actions CI via `OpenPhysics/.github`
+- Shared GitHub Actions CI via `OpenPhysics/Baton`
 
 ## Quick Start
 
