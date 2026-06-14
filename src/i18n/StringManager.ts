@@ -77,4 +77,21 @@ export class StringManager {
       simStringProperty: stringProperties.screens.simStringProperty,
     };
   }
+
+  /**
+   * Accessibility (Interactive Description) StringProperties.
+   *
+   * Returns the reactive `a11y` string tree used by the parallel DOM:
+   *   - `screenSummary.*` — play-area / control-area overview and an interaction
+   *     hint, read by `SimScreenSummaryContent`.
+   *   - `currentDetails` — a paragraph describing the simulation's current state.
+   *     In a real sim, derive a live version from model Properties (see
+   *     LunarLander's ScreenSummaryContent for the canonical pattern).
+   *
+   * Add `accessibleName` / `accessibleHelpText` strings for individual controls
+   * to the `a11y` group too, then read them through this same nested tree.
+   */
+  public getA11yStrings() {
+    return stringProperties.a11y;
+  }
 }

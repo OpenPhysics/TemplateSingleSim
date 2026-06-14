@@ -20,19 +20,27 @@
  *   center, minX, maxX, minY, maxY, width, height
  */
 
-import { Rectangle, Text } from "scenerystack/scenery";
+import { Node, Rectangle, Text } from "scenerystack/scenery";
 import { ResetAllButton } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
 import { ScreenView } from "scenerystack/sim";
 import SimColors from "../../SimColors.js";
 import type { SimModel } from "../model/SimModel.js";
+import { SimScreenSummaryContent } from "./SimScreenSummaryContent.js";
 
 // Margin between screen edges and buttons/panels (in layout-bounds coordinates)
 const SCREEN_VIEW_MARGIN = 20;
 
 export class SimScreenView extends ScreenView {
   public constructor(model: SimModel, options?: ScreenViewOptions) {
-    super(options);
+    // ── Accessibility: screen summary ───────────────────────────────────────────
+    // The screen summary is the first thing a screen-reader user encounters. It
+    // is registered here, in the ScreenView's super() options, so every sim wires
+    // it the same way. See SimScreenSummaryContent for the four content regions.
+    super({
+      screenSummaryContent: new SimScreenSummaryContent(model),
+      ...options,
+    });
 
     // ── Background ────────────────────────────────────────────────────────────
     // A full-screen rectangle that follows the active color profile.
@@ -62,6 +70,21 @@ export class SimScreenView extends ScreenView {
       bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
     });
     this.addChild(resetAllButton);
+
+    // ── Accessibility: keyboard / reading traversal order ───────────────────────
+    // Make the parallel DOM (Tab order and screen-reader reading order)
+    // deterministic and independent of child z-order. ScreenView throws if you
+    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
+    // the interactive nodes in the order a user should reach them — Reset All
+    // last. Non-interactive decoration (background, placeholder) is omitted.
+    this.addChild(
+      new Node({
+        pdomOrder: [
+          // TODO: add the sim's interactive nodes here, in traversal order
+          resetAllButton,
+        ],
+      }),
+    );
   }
 
   /**
