@@ -112,7 +112,9 @@ function fileExtension(filename: string): string {
 
 function processContents(dir: string): void {
   for (const entry of readdirSync(dir)) {
-    if (SKIP_DIRS.has(entry)) continue;
+    if (SKIP_DIRS.has(entry)) {
+      continue;
+    }
     const full = join(dir, entry);
     const stat = statSync(full);
     if (stat.isDirectory()) {
@@ -135,16 +137,18 @@ interface RenameOp {
   to: string;
 }
 
-function collectRenames(dir: string, ops: RenameOp[]): void {
+function collectRenames(dir: string, renameOps: RenameOp[]): void {
   for (const entry of readdirSync(dir)) {
-    if (SKIP_DIRS.has(entry)) continue;
+    if (SKIP_DIRS.has(entry)) {
+      continue;
+    }
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) {
-      collectRenames(full, ops);
+      collectRenames(full, renameOps);
     }
     const newEntry = applyReplacements(entry);
     if (newEntry !== entry) {
-      ops.push({ from: full, to: join(dir, newEntry) });
+      renameOps.push({ from: full, to: join(dir, newEntry) });
     }
   }
 }
