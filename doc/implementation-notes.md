@@ -2,51 +2,113 @@
 
 ## Architecture Overview
 
-TemplateSingleSim is a minimal starter scaffold for forking new single-screen SceneryStack simulations. It demonstrates the Model-View pattern, color profiles, localization, and reset behavior without domain-specific physics.
+TemplateSingleSim is a minimal starter scaffold for forking new single-screen SceneryStack simulations. It demonstrates the Model-View pattern, color profiles, localization, reset behavior, and reusable common components without domain-specific physics.
 
 ### High-Level Architecture
 
-The simulation follows a modular architecture:
+```
+main.ts
+  └─ SimScreen             (Screen<SimModel, SimScreenView>)
+       ├─ SimModel          state + logic  (src/sim-screen/model/)
+       └─ SimScreenView     visuals        (src/sim-screen/view/)
+            ├─ SimScreenSummaryContent     (PDOM overview)
+            └─ SimKeyboardHelpContent      (keyboard help dialog)
 
-- **Model Layer (`src/sim-screen/model/`)**: Stub model with TODO hooks for `step()` and `reset()`
-- **View Layer (`src/sim-screen/view/`)**: Placeholder background, label, and Reset All button
-- **Bootstrap**: `brand.js` must load first in `main.ts`; `init.ts` configures locales and splash
+src/common/
+  ├─ SimPanel.ts           pre-themed panel (all screens share SimColors)
+  └─ TimeModel.ts          composable play/pause + elapsed time
 
-Data flows from Model → View through AXON-ready property patterns documented in `SimModel.ts`.
+src/preferences/
+  ├─ SimPreferencesModel   sim-specific pref state
+  ├─ SimPreferencesNode    pref UI shown in Preferences → Simulation
+  └─ simQueryParameters    query-parameter declarations
+```
+
+Data flows Model → View through AXON `Property` objects. The view observes
+properties via `.link()` or `.lazyLink()` and updates reactively.
 
 ## Model Components
 
-### Core Model Design
+### SimModel
 
-`SimModel` is an empty coordinator with commented examples for observable properties and simulation stepping.
+An empty coordinator with documented hooks for `step(dt)` and `reset()`.
+Add physics state as `BooleanProperty`, `NumberProperty`, etc. from
+`scenerystack/axon`.
 
-When forking this template:
+### TimeModel (common)
 
-1. Rename `SimModel`, `SimScreen`, and `SimScreenView` to match the new sim name
-2. Replace `SimColors.ts` and `SimNamespace.ts` with sim-specific files
-3. Add physics logic in `step()` and state restoration in `reset()`
+`src/common/TimeModel.ts` is a reusable play/pause + elapsed-time model for
+animated sims. Compose it into your screen model rather than subclassing:
+
+```typescript
+export class YourModel implements TModel {
+  public readonly timer = new TimeModel();
+
+  public step(dt: number): void {
+    this.timer.step(dt);
+    // physics driven by this.timer.timeProperty.value
+  }
+  public reset(): void { this.timer.reset(); }
+}
+```
 
 ## View Components
 
 ### SimScreenView as Coordinator
 
-The screen view demonstrates layout using `layoutBounds`, background fill from `SimColors.ts`, and a `ResetAllButton` wired to `model.reset()`.
+The screen view demonstrates layout using `layoutBounds`, background fill from
+`SimColors.ts`, and a `ResetAllButton` wired to `model.reset()`. Add
+specialized sub-nodes under `src/sim-screen/view/`.
 
-When extending the view:
+### SimPanel (common)
 
-- Add specialized nodes under `src/sim-screen/view/`
-- Keep colors in `SimColors.ts` and strings in `src/i18n/strings_*.json`
-- Run `scripts/generate-icons.ts` after updating branding assets
+`src/common/SimPanel.ts` wraps SceneryStack's `Panel` with the sim's color
+scheme baked in. All control panels should use `SimPanel` so projector-mode
+switching is automatic:
+
+```typescript
+const panel = new SimPanel(content);            // defaults
+const panel = new SimPanel(content, { xMargin: 20 }); // any PanelOption override
+```
 
 ### Color Scheme
 
-`SimColors.ts` defines `ProfileColorProperty` instances for default and projector profiles. This is the pattern all forked sims should follow.
+`SimColors.ts` defines `ProfileColorProperty` instances for "default" (dark)
+and "projector" (light) profiles. SceneryStack switches profiles automatically
+when the user toggles Projector Mode in Preferences.
 
-### Fork Checklist
+## Forking this template
 
-- Update package name, sim title, and locale files (en, es, fr)
-- Regenerate PWA icons and splash assets
+### Automated rename
+
+```sh
+npm run rename -- --id friction --name "Friction"
+npm run check
+```
+
+`scripts/rename-sim.ts` replaces all template identifiers in file content and
+renames files and folders in one pass.
+
+### Manual fork checklist
+
+- Update `package.json` name, `init.ts` name/version, `brand.ts`
 - Replace placeholder view content with play area and control panels
+- Replace `SimColors.ts` colors with sim-specific palette
+- Update locale JSON files: title, screen names, a11y strings
+- Regenerate PWA icons (`npm run icons`) after editing `public/icons/icon.svg`
 - Add `doc/implementation-notes.md` describing the new sim's architecture
 
-Note that no dispose functions have been used, which should be addressed once listeners are added.
+## Multi-screen simulations
+
+See `doc/multi-screen.md` for a complete guide covering:
+- Independent vs. shared-model architectures
+- File structure for each screen
+- StringManager and locale changes
+- Home-screen icon requirements
+- Per-screen accessibility strings
+
+## Known gaps / TODOs
+
+- No dispose() calls yet — add them once Properties gain external listeners.
+- `SimModel.step()` and `reset()` bodies are stubs — fill in with real physics.
+- `SimScreenView` pdomOrder TODO comment — add interactive nodes as they are created.
