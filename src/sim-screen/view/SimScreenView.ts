@@ -59,6 +59,22 @@ export class SimScreenView extends ScreenView {
     });
     this.addChild(placeholderText);
 
+    // ── Accessibility: per-control names ────────────────────────────────────────
+    // EVERY interactive node must carry an `accessibleName` (and an
+    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
+    // string group — never a hard-coded English literal. Sun/scenery-phet controls
+    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
+    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
+    // Example (uncomment and adapt when you add a real control):
+    //
+    //   const a11y = StringManager.getInstance().getA11yStrings();
+    //   const exampleButton = new RectangularPushButton({
+    //     content: someIcon,
+    //     listener: () => model.doSomething(),
+    //     accessibleName: a11y.controls.exampleControlStringProperty,
+    //   });
+    //   this.addChild(exampleButton);
+
     // ── Reset All button ──────────────────────────────────────────────────────
     // Always position at bottom-right (PhET convention).
     const resetAllButton = new ResetAllButton({

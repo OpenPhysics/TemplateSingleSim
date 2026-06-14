@@ -94,4 +94,11 @@ export class StringManager {
   public getA11yStrings() {
     return stringProperties.a11y;
   }
+
+  /**
+   * Simulation-specific preference labels shown in Preferences → Simulation.
+   */
+  public getPreferences() {
+    return stringProperties.preferences;
+  }
 }
