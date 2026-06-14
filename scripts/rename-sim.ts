@@ -37,12 +37,12 @@ function getArg(flag: string): string | undefined {
 const newId = getArg("--id");
 const newName = getArg("--name");
 
-if (!newId || !newName) {
-  console.error("Usage: npm run rename -- --id <kebab-id> --name \"<Display Name>\"");
+if (!(newId && newName)) {
+  console.error('Usage: npm run rename -- --id <kebab-id> --name "<Display Name>"');
   console.error("");
   console.error("Examples:");
-  console.error("  npm run rename -- --id friction --name \"Friction\"");
-  console.error("  npm run rename -- --id wave-interference --name \"Wave Interference\"");
+  console.error('  npm run rename -- --id friction --name "Friction"');
+  console.error('  npm run rename -- --id wave-interference --name "Wave Interference"');
   process.exit(1);
 }
 
