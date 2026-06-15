@@ -11,6 +11,7 @@ Reusable single-screen SceneryStack template. Run `npm run rename` to fork it to
 | File | Purpose |
 |---|---|
 | `src/SimColors.ts` | All `ProfileColorProperty` instances |
+| `src/SimConstants.ts` | Named numeric constants (layout px, physics SI units) |
 | `src/SimNamespace.ts` | Namespace for color property names |
 | `src/i18n/StringManager.ts` | Singleton localized string accessor |
 | `src/sim-screen/SimScreen.ts` | Screen wrapper |

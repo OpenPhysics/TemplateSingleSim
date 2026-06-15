@@ -29,13 +29,14 @@ import type { Node } from "scenerystack/scenery";
 import type { PanelOptions } from "scenerystack/sun";
 import { Panel } from "scenerystack/sun";
 import SimColors from "../SimColors.js";
+import { PANEL_CORNER_RADIUS } from "../SimConstants.js";
 
 export class SimPanel extends Panel {
   public constructor(content: Node, providedOptions?: PanelOptions) {
     super(content, {
       fill: SimColors.panelBackgroundColorProperty,
       stroke: SimColors.panelBorderColorProperty,
-      cornerRadius: 6,
+      cornerRadius: PANEL_CORNER_RADIUS,
       xMargin: 12,
       yMargin: 10,
       ...providedOptions,

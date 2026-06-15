@@ -25,11 +25,9 @@ import { ResetAllButton } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
 import { ScreenView } from "scenerystack/sim";
 import SimColors from "../../SimColors.js";
+import { SCREEN_VIEW_MARGIN } from "../../SimConstants.js";
 import type { SimModel } from "../model/SimModel.js";
 import { SimScreenSummaryContent } from "./SimScreenSummaryContent.js";
-
-// Margin between screen edges and buttons/panels (in layout-bounds coordinates)
-const SCREEN_VIEW_MARGIN = 20;
 
 export class SimScreenView extends ScreenView {
   public constructor(model: SimModel, options?: ScreenViewOptions) {
