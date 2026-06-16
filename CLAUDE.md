@@ -65,7 +65,7 @@ the three required layers wired up: PDOM names, a `SimScreenSummaryContent`, and
 `pdomOrder` + `SimKeyboardHelpContent`. A11y strings live under the `a11y` key in each locale
 JSON, exposed via `StringManager.getA11yStrings()`. When building a real sim, make
 `currentDetailsContent` a live `DerivedProperty` over model state and add `accessibleName`s to
-every interactive node. Full convention and checklist: [../ACCESSIBILITY.md](../ACCESSIBILITY.md).
+every interactive node. Full convention and checklist: [../Baton/ACCESSIBILITY.md](../Baton/ACCESSIBILITY.md).
 
 ## Customizing a new sim from this template
 
