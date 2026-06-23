@@ -8,6 +8,7 @@
  * For multi-screen simulations, duplicate this file (e.g. IntroScreen.ts,
  * LabScreen.ts) and add each screen to the screens array in src/main.ts.
  */
+import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import type { ScreenOptions } from "scenerystack/sim";
 import { Screen } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
@@ -29,11 +30,13 @@ export class SimScreen extends Screen<SimModel, SimScreenView> {
         new SimScreenView(model, {
           tandem: options.tandem.createTandem("view"),
         }),
-      {
-        backgroundColorProperty: SimColors.backgroundColorProperty,
-        createKeyboardHelpNode: () => new SimKeyboardHelpContent(),
-        ...options,
-      },
+      optionize<SimScreenOptions, EmptySelfOptions, ScreenOptions>()(
+        {
+          backgroundColorProperty: SimColors.backgroundColorProperty,
+          createKeyboardHelpNode: () => new SimKeyboardHelpContent(),
+        },
+        options,
+      ),
     );
   }
 }
