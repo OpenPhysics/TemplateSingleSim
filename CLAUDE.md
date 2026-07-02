@@ -20,6 +20,7 @@ Reusable single-screen SceneryStack template. Run `npm run rename` to fork it to
 | `src/sim-screen/view/SimScreenSummaryContent.ts` | Accessible screen summary (reference a11y pattern) |
 | `src/sim-screen/view/SimKeyboardHelpContent.ts` | Keyboard-help dialog content |
 | `src/common/SimPanel.ts` | Pre-themed `Panel` wrapper (uses `SimColors` automatically) |
+| `src/common/SimButtonOptions.ts` | Flat button-appearance option bundles + light-control-surface combo-box options |
 | `src/common/TimeModel.ts` | Composable play/pause + elapsed-time model for animated sims |
 | `scripts/generate-icons.ts` | PNG icons from `public/icons/icon.svg` |
 | `scripts/rename-sim.ts` | Automated fork/rename across all files and folders |
@@ -57,6 +58,30 @@ export class FrictionModel implements TModel {
 
 Wire the view to `TimeControlNode` from `scenerystack/scenery-phet` binding on
 `model.timer.isPlayingProperty`.
+
+### SimButtonOptions
+
+SceneryStack's push/round buttons default to a 3-D/beveled look; every button in the sim
+should be flat instead. Spread these into the relevant options object:
+
+```typescript
+import { FLAT_RESET_ALL_BUTTON_OPTIONS, FLAT_RECTANGULAR_BUTTON_OPTIONS } from "../../common/SimButtonOptions.js";
+
+const resetAllButton = new ResetAllButton({ ...FLAT_RESET_ALL_BUTTON_OPTIONS, listener: () => {...} });
+const exampleButton = new RectangularPushButton({ ...FLAT_RECTANGULAR_BUTTON_OPTIONS, content, listener });
+```
+
+`FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS` spreads into `TimeControlNode`'s `playPauseStepButtonOptions`;
+`TIME_CONTROL_SPEED_RADIO_OPTIONS` fixes `TimeControlNode`'s speed-radio label color, which
+otherwise defaults to black text on the sim's dark default-mode panels. `SIM_COMBO_BOX_OPTIONS`
+themes a `ComboBox`'s button/list chrome to the light control surface below; pair item labels
+with `LIGHT_SURFACE_TEXT_FILL` (not `SimColors.textColorProperty`, which is for panel-fill text).
+
+`SimColors.ts` backs this with a "light control surfaces" section —
+`controlSurfaceColorProperty`, `controlSurfaceDisabledColorProperty`,
+`controlSurfaceTextColorProperty` — identical white/dark-text values in both default and
+projector profiles, so any component that must stay light regardless of theme (combo boxes,
+flat buttons, editable fields) keeps readable contrast automatically.
 
 ## Accessibility
 

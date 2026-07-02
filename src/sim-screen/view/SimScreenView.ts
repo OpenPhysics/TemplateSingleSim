@@ -24,6 +24,7 @@ import { Node, Rectangle, Text } from "scenerystack/scenery";
 import { ResetAllButton } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
 import { ScreenView } from "scenerystack/sim";
+import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/SimButtonOptions.js";
 import SimColors from "../../SimColors.js";
 import { SCREEN_VIEW_MARGIN } from "../../SimConstants.js";
 import type { SimModel } from "../model/SimModel.js";
@@ -67,6 +68,7 @@ export class SimScreenView extends ScreenView {
     //
     //   const a11y = StringManager.getInstance().getA11yStrings();
     //   const exampleButton = new RectangularPushButton({
+    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
     //     content: someIcon,
     //     listener: () => model.doSomething(),
     //     accessibleName: a11y.controls.exampleControlStringProperty,
@@ -76,6 +78,7 @@ export class SimScreenView extends ScreenView {
     // ── Reset All button ──────────────────────────────────────────────────────
     // Always position at bottom-right (PhET convention).
     const resetAllButton = new ResetAllButton({
+      ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
         model.reset();
         this.reset();
