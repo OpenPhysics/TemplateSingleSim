@@ -116,8 +116,9 @@ Run `npm test`. Expand `memory-leak.test.ts` when adding runtime-created nodes o
 ## Multi-screen simulations
 
 Default is single-screen. To add screens, see **`doc/multi-screen.md`**: per-screen folders mirroring
-`src/sim-screen/`, `StringManager` screen-name getters, optional shared root model, register all
-screens in `main.ts`.
+`src/sim-screen/`, `StringManager` screen-name getters, optional shared root model, a shared
+`src/common/{SimName}ScreenIcons.ts` module (`create{Screen}Icon()` factories wired as
+`homeScreenIcon` / `navigationBarIcon`), and register all screens in `main.ts`.
 
 ## PWA
 

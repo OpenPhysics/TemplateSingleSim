@@ -169,6 +169,7 @@ Summary:
 - Add screen-name keys to all locale JSON files
 - Expose new `StringProperty` getters in `StringManager.getScreenNames()`
 - For shared state, create a root model passed to each per-screen model
+- Add `src/common/{SimName}ScreenIcons.ts` with `create{Screen}Icon()` factories; wire `homeScreenIcon` + `navigationBarIcon` on each Screen
 - Register all screens in the `screens` array in `main.ts`
 
 ## Using this template beyond a direct copy

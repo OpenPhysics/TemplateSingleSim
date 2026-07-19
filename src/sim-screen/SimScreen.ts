@@ -6,7 +6,9 @@
  * to the parent Screen class.
  *
  * For multi-screen simulations, duplicate this file (e.g. IntroScreen.ts,
- * LabScreen.ts) and add each screen to the screens array in src/main.ts.
+ * LabScreen.ts), add each screen to the screens array in src/main.ts, and put
+ * shared create*Icon() factories in src/common/{SimName}ScreenIcons.ts (see
+ * doc/multi-screen.md).
  */
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import type { ScreenOptions } from "scenerystack/sim";

@@ -87,6 +87,8 @@ Mirror the structure of `src/sim-screen/`:
 
 ```
 src/
+├─ common/
+│   └─ FrictionScreenIcons.ts   # createIntroIcon(), createLabIcon(), …
 ├─ intro-screen/
 │   ├─ IntroScreen.ts
 │   ├─ model/
@@ -106,7 +108,9 @@ src/
 ```
 
 Each screen file follows the same `Screen<Model, View>` pattern as the
-existing `SimScreen.ts`.
+existing `SimScreen.ts`. Screen icons live in one shared module under
+`src/common/` (see [Home screen icons](#home-screen-icons)) — do **not** put
+a `*ScreenIcon.ts` next to each screen.
 
 ### 4 — (Optional) Create a shared root model
 
@@ -182,20 +186,105 @@ const sim = new Sim(stringManager.getTitleStringProperty(), screens, { … });
 
 ## Home screen icons
 
-Multi-screen sims show a home screen by default. Each screen needs a 548×373 px
-`ScreenIcon` (or the SceneryStack default is used):
+Multi-screen sims show a home screen by default. Each screen needs a
+`homeScreenIcon` and usually a `navigationBarIcon`, or SceneryStack falls
+back to a generic placeholder.
+
+### Fleet convention
+
+Put **all** screen icons in one module:
+
+```
+src/common/{SimName}ScreenIcons.ts
+```
+
+Export one factory per screen named `create{Screen}Icon()`:
+
+| Screen | Factory |
+|---|---|
+| Intro | `createIntroIcon()` |
+| Lab | `createLabIcon()` |
+| … | `create…Icon()` |
+
+Wire both icons in each `*Screen.ts` constructor via `optionize` defaults
+(same pattern as MotionsOfTheSun / TheRamp):
 
 ```typescript
-import { ScreenIcon } from "scenerystack/sim";
-import { Rectangle } from "scenerystack/scenery";
+import { createIntroIcon } from "../common/FrictionScreenIcons.js";
 
-const icon = new ScreenIcon(
-  new Rectangle(0, 0, 548, 373, { fill: SimColors.accentColorProperty }),
-  { maxIconWidthProportion: 1, maxIconHeightProportion: 1 }
+optionize<IntroScreenOptions, EmptySelfOptions, ScreenOptions>()(
+  {
+    backgroundColorProperty: FrictionColors.backgroundColorProperty,
+    createKeyboardHelpNode: () => new IntroKeyboardHelpContent(),
+    homeScreenIcon: createIntroIcon(),
+    navigationBarIcon: createIntroIcon(),
+  },
+  options,
 );
 ```
 
-Pass it as `homeScreenIcon` and `navigationBarIcon` on the Screen options.
+Do **not** use per-screen classes like `intro-screen/IntroScreenIcon.ts`.
+
+### Icon module skeleton
+
+Draw on the standard PhET **548 × 373** canvas with scenery primitives and
+`*Colors` `ProfileColorProperty`s so icons follow default / projector mode:
+
+```typescript
+/**
+ * FrictionScreenIcons.ts
+ *
+ * Programmatic home-screen / navigation-bar icons for each Friction screen.
+ * Drawn on the standard PhET 548 × 373 canvas using FrictionColors.
+ */
+import { Node, Rectangle } from "scenerystack/scenery";
+import { ScreenIcon } from "scenerystack/sim";
+import FrictionColors from "../FrictionColors.js";
+
+const W = 548;
+const H = 373;
+
+function background(): Rectangle {
+  return new Rectangle(0, 0, W, H, { fill: FrictionColors.backgroundColorProperty });
+}
+
+function iconFrom(content: Node): ScreenIcon {
+  return new ScreenIcon(content, {
+    maxIconWidthProportion: 1,
+    maxIconHeightProportion: 1,
+    fill: FrictionColors.backgroundColorProperty,
+  });
+}
+
+export function createIntroIcon(): ScreenIcon {
+  // Distinctive motif for the Intro screen (keep it readable at navbar size too).
+  return iconFrom(
+    new Node({
+      children: [
+        background(),
+        new Rectangle(180, 120, 188, 133, {
+          fill: FrictionColors.accentColorProperty,
+          cornerRadius: 12,
+        }),
+      ],
+    }),
+  );
+}
+
+export function createLabIcon(): ScreenIcon {
+  return iconFrom(
+    new Node({
+      children: [
+        background(),
+        // … Lab-specific motif …
+      ],
+    }),
+  );
+}
+```
+
+Each icon should be a miniature of what that screen is about so learners can
+tell the screens apart on the home screen.
 
 ---
 
