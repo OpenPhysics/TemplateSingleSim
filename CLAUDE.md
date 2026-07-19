@@ -92,6 +92,26 @@ JSON, exposed via `StringManager.getA11yStrings()`. When building a real sim, ma
 `currentDetailsContent` a live `DerivedProperty` over model state and add `accessibleName`s to
 every interactive node. Full convention and checklist: [../Baton/ACCESSIBILITY.md](../Baton/ACCESSIBILITY.md).
 
+## Testing
+
+Fleet-standard Vitest layout (keep when forking):
+
+| Path | Purpose |
+|---|---|
+| `vitest.config.ts` | `happy-dom` environment; `setupFiles: ["./tests/setup.ts"]`; `execArgv: ["--expose-gc"]` |
+| `tests/setup.ts` | Canvas / AudioContext mocks + `init({ name: "…" })` before SceneryStack imports |
+| `tests/TimeModel.test.ts` | Sample model unit tests — replace with real physics tests |
+| `tests/memory-leak.test.ts` | WeakRef + `forceGC` dispose regression (fleet pattern from QubitSketch) |
+| `tests/fuzz/fuzz.spec.ts` | Optional Playwright fuzz smoke via joist `?fuzz` |
+| `playwright.config.ts` | Chromium project + Vite webServer for fuzz |
+
+- Put unit tests only under root `tests/`, mirroring `src/` (never co-locate or use `__tests__/`).
+- Change the `name` passed to `init()` in `tests/setup.ts` to match `package.json` after `npm run rename`.
+- Run `npm test`. CI runs the suite when a `test` script is present.
+- Expand `memory-leak.test.ts` for any component that adds/removes nodes or links Properties at
+  runtime (see OpticsLab for a deep suite).
+- Optional: `npm run test:fuzz` / `test:fuzz:quick` (not part of default CI).
+
 ## Customizing a new sim from this template
 
 ### Automated rename (recommended)

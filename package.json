@@ -32,6 +32,8 @@
     "watch": "tsc --watch",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:fuzz": "playwright test --project=chromium",
+    "test:fuzz:quick": "FUZZ_DURATION=10 playwright test --project=chromium",
     "icons": "tsx scripts/generate-icons.ts",
     "rename": "tsx scripts/rename-sim.ts",
     "clean": "rm -rf dist",
@@ -42,7 +44,9 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.4",
+    "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",
+    "playwright": "^1.61.1",
     "happy-dom": "^20.11.0",
     "jsdom": "^29.1.1",
     "png-to-ico": "^3.0.2",

@@ -6,7 +6,7 @@ Vite 8, TypeScript 7, and Biome 2.
 ## Features
 
 - Single-screen SceneryStack scaffold with model/view separation
-- English and French localization via `StringManager`
+- English, Spanish, and French localization via `StringManager`
 - Default and projector color profiles
 - Progressive Web App (installable, offline-capable)
 - Git hooks for Biome pre-commit checks
@@ -27,11 +27,15 @@ npm start        # dev server → http://localhost:5173
 | `npm start` / `npm run dev` | Start Vite dev server |
 | `npm run build` | Type-check + production build → `dist/` |
 | `npm run preview` | Preview the production build locally |
+| `npm test` | Run Vitest unit tests (includes memory-leak suite) |
+| `npm run test:fuzz` | Optional Playwright fuzz smoke (`?fuzz`, default 15s) |
+| `npm run test:fuzz:quick` | Shorter fuzz smoke (10s) |
 | `npm run check` | TypeScript type check |
 | `npm run lint` | Biome lint check |
 | `npm run format` | Auto-format all files |
 | `npm run fix` | Lint + auto-fix |
 | `npm run icons` | Regenerate PNG icons from `public/icons/icon.svg` |
+| `npm run rename` | Fork this template to a new sim id/name |
 | `npm run clean` | Remove `dist/` |
 
 New sims start at `version: "0.0.0"` in `package.json`. Bump only when cutting a release (for example `npm version patch` and a matching git tag). Keep `name` in kebab-case; it is separate from the SceneryStack sim identifier in `src/init.ts`.
