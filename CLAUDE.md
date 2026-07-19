@@ -4,7 +4,9 @@ Sim-specific context for AI assistants. General SceneryStack guidance: [OpenPhys
 
 ## Project
 
-Reusable single-screen SceneryStack template. Run `npm run rename` to fork it to a new sim name automatically. For multi-screen sims, see `doc/multi-screen.md`.
+Reusable single-screen SceneryStack template and **canonical accessibility reference** for
+OpenPhysics sims. Run `npm run rename` to fork it to a new sim name automatically. For
+multi-screen sims, see [`doc/multi-screen.md`](doc/multi-screen.md).
 
 ## Key files
 
@@ -45,7 +47,7 @@ For simulations with animation, compose `TimeModel` into your screen model:
 ```typescript
 import { TimeModel } from "../../common/TimeModel.js";
 
-export class FrictionModel implements TModel {
+export class MyModel implements TModel {
   public readonly timer = new TimeModel();   // starts paused; pass true to auto-play
 
   public step(dt: number): void {
@@ -90,7 +92,14 @@ the three required layers wired up: PDOM names, a `SimScreenSummaryContent`, and
 `pdomOrder` + `SimKeyboardHelpContent`. A11y strings live under the `a11y` key in each locale
 JSON, exposed via `StringManager.getA11yStrings()`. When building a real sim, make
 `currentDetailsContent` a live `DerivedProperty` over model state and add `accessibleName`s to
-every interactive node. Full convention and checklist: [../Baton/ACCESSIBILITY.md](../Baton/ACCESSIBILITY.md).
+every interactive node. Full convention and checklist: [Baton/ACCESSIBILITY.md](https://github.com/OpenPhysics/Baton/blob/main/ACCESSIBILITY.md).
+
+## Compliance carve-outs
+
+A clean fork of this template rarely needs compliance carve-outs — root `SimConstants.ts`,
+`*Colors.ts`, `*Namespace.ts`, standard screen layout, and full a11y wiring pass Baton's
+compliance check out of the box. Document carve-outs in the forked sim's `CLAUDE.md` only when
+you introduce a deliberate deviation (nested constants, hardcoded interaction fills, etc.).
 
 ## Testing
 
@@ -101,7 +110,7 @@ Fleet-standard Vitest layout (keep when forking):
 | `vitest.config.ts` | `happy-dom` environment; `setupFiles: ["./tests/setup.ts"]`; `execArgv: ["--expose-gc"]` |
 | `tests/setup.ts` | Canvas / AudioContext mocks + `init({ name: "…" })` before SceneryStack imports |
 | `tests/TimeModel.test.ts` | Sample model unit tests — replace with real physics tests |
-| `tests/memory-leak.test.ts` | WeakRef + `forceGC` dispose regression (fleet pattern from QubitSketch) |
+| `tests/memory-leak.test.ts` | WeakRef + `forceGC` dispose regression (fleet pattern) |
 | `tests/fuzz/fuzz.spec.ts` | Optional Playwright fuzz smoke via joist `?fuzz` |
 | `playwright.config.ts` | Chromium project + Vite webServer for fuzz |
 
@@ -111,6 +120,25 @@ Fleet-standard Vitest layout (keep when forking):
 - Expand `memory-leak.test.ts` for any component that adds/removes nodes or links Properties at
   runtime (see OpticsLab for a deep suite).
 - Optional: `npm run test:fuzz` / `test:fuzz:quick` (not part of default CI).
+
+## Commands
+
+```bash
+npm run lint && npm run check && npm run build && npm test
+```
+
+| Command | Description |
+|---|---|
+| `npm start` / `npm run dev` | Vite dev server |
+| `npm run build` | Type-check + production build |
+| `npm run build:single` | Single-file build mode |
+| `npm run check` | TypeScript (`tsc --noEmit` + scripts project) |
+| `npm run lint` / `npm run fix` | Biome check / auto-fix |
+| `npm test` | Vitest unit tests |
+| `npm run test:fuzz` | Playwright fuzz smoke |
+| `npm run test:fuzz:quick` | 10s fuzz |
+| `npm run icons` | Regenerate PWA icons |
+| `npm run rename` | Automated fork/rename (`--id`, `--name`) |
 
 ## Customizing a new sim from this template
 
@@ -122,7 +150,8 @@ npm run rename -- --id friction --name "Friction"
 npm run rename -- --id wave-interference --name "Wave Interference"
 ```
 
-This replaces all template identifiers in file contents and renames files/folders. Run `npm run check` afterwards to verify TypeScript is clean.
+This replaces all template identifiers in file contents and renames files/folders. Run
+`npm run check` afterwards to verify TypeScript is clean.
 
 ### Manual checklist (if not using the rename script)
 
@@ -133,7 +162,7 @@ This replaces all template identifiers in file contents and renames files/folder
 
 ## Multi-screen sims
 
-Full guide: **`doc/multi-screen.md`**
+Full guide: [`doc/multi-screen.md`](doc/multi-screen.md)
 
 Summary:
 - Create a new screen folder mirroring `src/sim-screen/` for each screen

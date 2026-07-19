@@ -1,114 +1,130 @@
 # Implementation Notes - Sim Template
 
+Developer-facing notes on the **TemplateSingleSim** scaffold. **Replace and expand this file when
+forking** to describe your sim's real architecture (see Stern Gerlach or Light Propagation for
+target quality). Until then, this documents what the template provides out of the box.
+
 ## Architecture Overview
 
-TemplateSingleSim is a minimal starter scaffold for forking new single-screen SceneryStack simulations. It demonstrates the Model-View pattern, color profiles, localization, reset behavior, and reusable common components without domain-specific physics.
-
-### High-Level Architecture
+TemplateSingleSim is the fleet-canonical starting point for new single-screen SceneryStack sims.
+It demonstrates Model–View separation, color profiles, localization, reset behavior, accessibility
+reference wiring, and reusable common components — **without** domain physics.
 
 ```
 main.ts
   └─ SimScreen             (Screen<SimModel, SimScreenView>)
-       ├─ SimModel          state + logic  (src/sim-screen/model/)
+       ├─ SimModel          state + logic  (src/sim-screen/model/)  ← stub: add physics here
        └─ SimScreenView     visuals        (src/sim-screen/view/)
-            ├─ SimScreenSummaryContent     (PDOM overview)
+            ├─ SimScreenSummaryContent     (PDOM overview — reference a11y pattern)
             └─ SimKeyboardHelpContent      (keyboard help dialog)
 
 src/common/
-  ├─ SimPanel.ts           pre-themed panel (all screens share SimColors)
+  ├─ SimPanel.ts           pre-themed panel (uses SimColors)
+  ├─ SimButtonOptions.ts   flat button / combo-box option bundles
   └─ TimeModel.ts          composable play/pause + elapsed time
 
 src/preferences/
   ├─ SimPreferencesModel   sim-specific pref state
-  ├─ SimPreferencesNode    pref UI shown in Preferences → Simulation
-  └─ simQueryParameters    query-parameter declarations
+  ├─ SimPreferencesNode    pref UI in Preferences → Simulation
+  └─ simQueryParameters    QueryStringMachine declarations
 ```
 
-Data flows Model → View through AXON `Property` objects. The view observes
-properties via `.link()` or `.lazyLink()` and updates reactively.
+Data flows Model → View through AXON `Property` objects (`.link()` / `.lazyLink()`). The view never
+integrates physics; the model never imports scenery.
 
-## Model Components
+## Forking checklist
 
-### SimModel
-
-An empty coordinator with documented hooks for `step(dt)` and `reset()`.
-Add physics state as `BooleanProperty`, `NumberProperty`, etc. from
-`scenerystack/axon`.
-
-### TimeModel (common)
-
-`src/common/TimeModel.ts` is a reusable play/pause + elapsed-time model for
-animated sims. Compose it into your screen model rather than subclassing:
-
-```typescript
-export class YourModel implements TModel {
-  public readonly timer = new TimeModel();
-
-  public step(dt: number): void {
-    this.timer.step(dt);
-    // physics driven by this.timer.timeProperty.value
-  }
-  public reset(): void { this.timer.reset(); }
-}
-```
-
-## View Components
-
-### SimScreenView as Coordinator
-
-The screen view demonstrates layout using `layoutBounds`, background fill from
-`SimColors.ts`, and a `ResetAllButton` wired to `model.reset()`. Add
-specialized sub-nodes under `src/sim-screen/view/`.
-
-### SimPanel (common)
-
-`src/common/SimPanel.ts` wraps SceneryStack's `Panel` with the sim's color
-scheme baked in. All control panels should use `SimPanel` so projector-mode
-switching is automatic:
-
-```typescript
-const panel = new SimPanel(content);            // defaults
-const panel = new SimPanel(content, { xMargin: 20 }); // any PanelOption override
-```
-
-### Color Scheme
-
-`SimColors.ts` defines `ProfileColorProperty` instances for "default" (dark)
-and "projector" (light) profiles. SceneryStack switches profiles automatically
-when the user toggles Projector Mode in Preferences.
-
-## Forking this template
-
-### Automated rename
+### Automated rename (recommended)
 
 ```sh
-npm run rename -- --id friction --name "Friction"
+npm run rename -- --id my-sim --name "My Simulation"
 npm run check
 ```
 
-`scripts/rename-sim.ts` replaces all template identifiers in file content and
-renames files and folders in one pass.
+`scripts/rename-sim.ts` replaces template identifiers in file contents and renames files/folders.
 
-### Manual fork checklist
+### Manual steps (after rename or if skipping the script)
 
-- Update `package.json` name, `init.ts` name/version, `brand.ts`
-- Replace placeholder view content with play area and control panels
-- Replace `SimColors.ts` colors with sim-specific palette
-- Update locale JSON files: title, screen names, a11y strings
-- Regenerate PWA icons (`npm run icons`) after editing `public/icons/icon.svg`
-- Add `doc/implementation-notes.md` describing the new sim's architecture
+1. **`doc/model.md`** — educator physics (equations, ranges, simplifications).
+2. **`doc/implementation-notes.md`** — this file, rewritten for your architecture.
+3. **`SimModel`** — real Properties, `step(dt)`, `reset()`; compose `TimeModel` if animated.
+4. **`SimScreenView`** — play area + controls; wire `ResetAllButton` to `model.reset()`.
+5. **`SimColors.ts`** — sim palette (default + projector profiles).
+6. **Locale JSON** — title, strings, `a11y` keys; register locales in `init.ts`.
+7. **`public/icons/icon.svg`** → `npm run icons`; align theme color in `index.html` / vite config.
+8. **`tests/setup.ts`** — `init({ name: … })` must match `package.json` name after rename.
+9. **`CLAUDE.md`** — sim-specific file map and pitfalls for AI assistants.
+
+## Common components (keep when forking)
+
+### SimPanel
+
+Every control panel should use `SimPanel` so projector-mode switching is automatic:
+
+```typescript
+import { SimPanel } from "../../common/SimPanel.js";
+const panel = new SimPanel(content);
+const panelWide = new SimPanel(content, { xMargin: 20 });
+```
+
+### TimeModel
+
+Compose into your screen model for animation (do not subclass `TimeModel`):
+
+```typescript
+export class MyModel implements TModel {
+  public readonly timer = new TimeModel();  // pass true to auto-play on startup
+
+  public step(dt: number): void {
+    this.timer.step(dt);
+    // physics uses this.timer.timeProperty.value
+  }
+  public reset(): void { this.timer.reset(); /* restore initial state */ }
+}
+```
+
+Wire `TimeControlNode` to `model.timer.isPlayingProperty` in the view.
+
+### SimButtonOptions
+
+Spread flat button options into every push/round button and `TimeControlNode` (see `CLAUDE.md`).
+Use `SIM_COMBO_BOX_OPTIONS` + `LIGHT_SURFACE_TEXT_FILL` for light control surfaces on dark panels.
+
+## Accessibility (reference implementation)
+
+The template is the **canonical OpenPhysics a11y reference**:
+
+- PDOM `accessibleName` on interactive nodes (prefer live `StringProperty`s).
+- `SimScreenSummaryContent` with a live `currentDetailsContent` `DerivedProperty` over model state.
+- Explicit `pdomOrder` + `SimKeyboardHelpContent`.
+- Strings under `a11y` in locale JSON → `StringManager.getA11yStrings()`.
+
+Full checklist: [Baton/ACCESSIBILITY.md](https://github.com/OpenPhysics/Baton/blob/main/ACCESSIBILITY.md).
+
+## Testing (fleet layout — keep when forking)
+
+| Path | Purpose |
+|---|---|
+| `vitest.config.ts` | `happy-dom`; `setupFiles: ["./tests/setup.ts"]`; `execArgv: ["--expose-gc"]` |
+| `tests/setup.ts` | Canvas/AudioContext mocks + `init()` before SceneryStack imports |
+| `tests/TimeModel.test.ts` | **Replace** with real model/physics tests mirroring `src/` |
+| `tests/memory-leak.test.ts` | WeakRef + `forceGC` dispose regression |
+| `tests/fuzz/fuzz.spec.ts` | Optional Playwright smoke via `?fuzz` |
+
+Run `npm test`. Expand `memory-leak.test.ts` when adding runtime-created nodes or Property links.
 
 ## Multi-screen simulations
 
-See `doc/multi-screen.md` for a complete guide covering:
-- Independent vs. shared-model architectures
-- File structure for each screen
-- StringManager and locale changes
-- Home-screen icon requirements
-- Per-screen accessibility strings
+Default is single-screen. To add screens, see **`doc/multi-screen.md`**: per-screen folders mirroring
+`src/sim-screen/`, `StringManager` screen-name getters, optional shared root model, register all
+screens in `main.ts`.
 
-## Known gaps / TODOs
+## PWA
 
-- No dispose() calls yet — add them once Properties gain external listeners.
-- `SimModel.step()` and `reset()` bodies are stubs — fill in with real physics.
-- `SimScreenView` pdomOrder TODO comment — add interactive nodes as they are created.
+After `npm run build`, the sim is installable offline via Workbox (`dist/manifest.webmanifest`).
+
+## Known template stubs (remove when forking)
+
+- `SimModel.step()` / `reset()` — empty placeholders until you add physics.
+- Placeholder play-area content in `SimScreenView` — replace with real UI.
+- `tests/TimeModel.test.ts` — sample only; add tests for your model under `tests/`.
