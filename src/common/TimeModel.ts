@@ -31,7 +31,6 @@
  *   import { TimeControlNode } from "scenerystack/scenery-phet";
  *
  *   const timeControl = new TimeControlNode( model.timer.isPlayingProperty, {
- *     timeSpeedProperty: model.timer.timeSpeedProperty, // optional
  *     playPauseStepButtonOptions: {
  *       stepForwardButtonOptions: {
  *         listener: () => model.step( 1 / 60 ),
