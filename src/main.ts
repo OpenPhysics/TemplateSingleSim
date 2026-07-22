@@ -74,6 +74,3 @@ onReadyToLaunch(() => {
 
   sim.start();
 });
-// hook test
-// test
-// test
